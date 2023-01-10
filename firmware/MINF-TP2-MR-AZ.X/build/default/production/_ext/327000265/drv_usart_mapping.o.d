@@ -1,4 +1,5 @@
-build/default/production/_ext/1360937237/app.o: ../src/app.c ../src/app.h \
+build/default/production/_ext/327000265/drv_usart_mapping.o: \
+ ../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c \
  ../src/system_config/default/system_config.h \
  ../../../../../../bsp/pic32mx_skes/bsp.h \
  ../../../../../../framework/peripheral/ports/plib_ports.h \
@@ -243,11 +244,7 @@ build/default/production/_ext/1360937237/app.o: ../src/app.c ../src/app.h \
  ../../../../../../framework/system/debug/sys_debug.h \
  ../../../../../../framework/system/ports/sys_ports.h \
  ../../../../../../framework/system/ports/sys_ports_definitions.h \
- ../src/app.h ../../../../../../bsp/pic32mx_skes/Mc32DriverAdc.h \
- ../src/GestPWM.h ../../../../../../bsp/pic32mx_skes/Mc32DriverLcd.h \
- ../../../../../../bsp/pic32mx_skes/Mc32Delays.h
-
-../src/app.h:
+ ../src/app.h ../../../../../../bsp/pic32mx_skes/Mc32DriverAdc.h
 
 ../src/system_config/default/system_config.h:
 
@@ -740,9 +737,3 @@ build/default/production/_ext/1360937237/app.o: ../src/app.c ../src/app.h \
 ../src/app.h:
 
 ../../../../../../bsp/pic32mx_skes/Mc32DriverAdc.h:
-
-../src/GestPWM.h:
-
-../../../../../../bsp/pic32mx_skes/Mc32DriverLcd.h:
-
-../../../../../../bsp/pic32mx_skes/Mc32Delays.h:
