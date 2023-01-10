@@ -123,19 +123,7 @@ void __ISR(_TIMER_3_VECTOR, ipl0AUTO) IntHandlerDrvTmrInstance2(void)
 {
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
-void __ISR(_TIMER_4_VECTOR, ipl7AUTO) IntHandlerDrvTmrInstance3(void)
-{
-    /* LED pour mesure temps interrupt */
-    BSP_LEDOn(BSP_LED_1);
-    /* PWM Software */
-    GPWM_ExecPWMSoft(&PwmData);
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
     
-    /* LED pour mesure temps interrupt */
-    BSP_LEDOff(BSP_LED_1);
-}
- 
- 
 /*******************************************************************************
  End of File
 */

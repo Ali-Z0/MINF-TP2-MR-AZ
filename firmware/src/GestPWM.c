@@ -38,8 +38,6 @@ void GPWM_Initialize(S_pwmSettings *pData)
     DRV_TMR1_Start();           
     // DRV_TMR2_Start();  
     DRV_TMR2_Start();            
-    // DRV_TMR3_Start();  
-    DRV_TMR3_Start();
 
     /*Initialisation des OC*/
     //init OC0 
