@@ -105,9 +105,9 @@ void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void)
     if (i >= 151)
     {
         APP_UpdateState(APP_STATE_SERVICE_TASKS); 
-        GPWM_GetSettings(&PwmData);
-        GPWM_DispSettings(&PwmData);
-        GPWM_ExecPWM(&PwmData);
+        //GPWM_GetSettings(&PwmData);
+        //GPWM_DispSettings(&PwmData);
+        //GPWM_ExecPWM(&PwmData);
     }
     else
     {

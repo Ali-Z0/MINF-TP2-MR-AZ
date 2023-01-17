@@ -57,6 +57,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "GestPWM.h"
 #include "Mc32DriverLcd.h"
 #include "Mc32Delays.h"
+#include "GesFifoTh32.h"
+#include "Mc32gest_RS232.h"
 
 
 // *****************************************************************************
@@ -81,7 +83,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 */
 
 APP_DATA appData;
-
+S_pwmSettings pwmData, pwmDataToSend;
 
 uint8_t LedOffFlag = 1;
 uint8_t chenillard = 0b00000001;
@@ -142,6 +144,7 @@ void APP_Initialize ( void )
 
 void APP_Tasks ( void )
 {
+    static int commStatus = 0;
 
     /* Check the application's current state. */
     switch ( appData.state )
@@ -159,9 +162,9 @@ void APP_Tasks ( void )
             lcd_bl_on();
             
             /* Peripherals initalisations */
-            GPWM_Initialize(&PwmData);
+            GPWM_Initialize(&pwmData);
             
-            //Initialisation l'ADc
+            // Initialisation l'ADc
             BSP_InitADC10();
             
             /* Update state */
@@ -170,8 +173,9 @@ void APP_Tasks ( void )
             /* All LEDS ON */
             APP_LedMask(0x00);
             
-           
-            
+            /* Initialisation of the serial communication */
+            InitFifoComm();
+                    
             break;
         }
         case APP_STATE_WAIT:
@@ -181,12 +185,29 @@ void APP_Tasks ( void )
         }
         case APP_STATE_SERVICE_TASKS:
         {
+            /* Reception of parameters */
+            commStatus = GetMessage(&pwmData);
+            
+            /* Reads potentiometers */
+            if(commStatus == 0) GPWM_GetSettings(&pwmData); // Local 
+            else GPWM_GetSettings(&pwmDataToSend); // Remote 
+            
+            /* Print on the LCD */
+            GPWM_DispSettings(&pwmData, commStatus);
+            
+            /* Executes PMM and motor management */
+            GPWM_ExecPWM(&pwmData);
+            
+            /* Sends data */
+            if(commStatus == 1) SendMessage(&pwmData); // Local 
+            else SendMessage(&pwmDataToSend); // Remote 
+            
+            appData.state = APP_STATE_WAIT;
             break;
         }
 
         /* TODO: implement your application state machine.*/
         
-
         /* The default state should never be executed. */
         default:
         {
