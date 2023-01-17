@@ -1,0 +1,84 @@
+\documentclass[12pt]{article}
+% Packages and macros
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{pgf}
+\usepackage{pgfpages}
+\usepackage{parallel}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{datetime}
+%\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{blindtext}
+\usepackage{multicol}
+\usepackage{enumerate}
+\usepackage{pifont}
+\usepackage{amssymb}
+\usepackage[export]{adjustbox}
+\usepackage[margin=1in]{geometry}
+\usepackage[francais]{babel}
+\usepackage{caption}
+\newcommand{\source}[1]{\vspace{-12pt} \caption*{Source: {#1}} }
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[thinlines]{easytable}
+
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH], \THEYEAR}
+
+\pgfpagesdeclarelayout{boxed}
+{
+  \edef\pgfpageoptionborder{0pt}
+}
+{
+  \pgfpagesphysicalpageoptions
+  {%
+    logical pages=1,%
+  }
+  \pgfpageslogicalpageoptions{1}
+  {
+    border code=\pgfsetlinewidth{1pt}\pgfstroke,%
+    border shrink=\pgfpageoptionborder,%
+    resized width=.98\pgfphysicalwidth,%
+    resized height=.98\pgfphysicalheight,%
+    center=\pgfpoint{.5\pgfphysicalwidth}{.5\pgfphysicalheight}%
+  }%
+}
+\pgfpagesuselayout{boxed}
+\setlength{\columnsep}{0.5cm}
+
+% \renewcommand\thesubsection{\Alph{subsection}}
+
+\begin{document}
+\pagestyle{fancy}
+\lhead{EIND}
+\chead {\today}
+\rhead{TP0}
+\fontsize{16}{16}\selectfont
+
+% ------------------------- TITLE PAGE INSERTION ------------------------ 
+\input{titlepage}
+\clearpage
+
+
+% --------------------- TABLE OF CONTENTS  ------------------------------- 
+\tableofcontents
+\clearpage
+
+% ------------------------- INTRODUCTION --------------------------------- 
+\section{Introduction}
+	
+\clearpage
+
+
+% ------------------- PRELIMINARY TASK (TASK0) --------------------------- 
+\input{Task0}
+
+% ------------------------ MAIN TASK (TASK1) ----------------------------- 
+\input{Task1}
+
+\end{document}
