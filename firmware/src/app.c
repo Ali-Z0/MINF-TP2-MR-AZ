@@ -151,11 +151,11 @@ void APP_Tasks ( void )
         {
             /* Initialisation Displaying */
             lcd_init(); 
-            printf_lcd("TP1 PWM 2022-2023");
+            printf_lcd("TP2 PWM 2022-2023");
             lcd_gotoxy(1,2);
             printf_lcd("Ali Zoubir"); 
             lcd_gotoxy(1,3);
-            printf_lcd("Caroline Mieville"); 
+            printf_lcd("Meven Ricchieri"); 
             lcd_bl_on();
             
             /* Peripherals initalisations */
@@ -169,6 +169,8 @@ void APP_Tasks ( void )
             
             /* All LEDS ON */
             APP_LedMask(0x00);
+            
+           
             
             break;
         }
