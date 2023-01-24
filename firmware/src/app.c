@@ -162,11 +162,7 @@ void APP_Tasks ( void )
             lcd_bl_on();
             
             /* Peripherals initalisations */
-
             GPWM_Initialize(&pwmData);
-            GPWM_Initialize(&PwmData);
-            InitFifoComm();
-
             
             // Initialisation l'ADc
             BSP_InitADC10();
@@ -179,7 +175,7 @@ void APP_Tasks ( void )
             
             /* Initialisation of the serial communication */
             InitFifoComm();
-                    
+            
             break;
         }
         case APP_STATE_WAIT:
@@ -189,24 +185,29 @@ void APP_Tasks ( void )
         }
         case APP_STATE_SERVICE_TASKS:
         {
-            /* Reception of parameters */
+            BSP_LEDStateSet(BSP_LED_1, 0);
+            
+            /* Reception of parameters */ 
             commStatus = GetMessage(&pwmData);
             
-            /* Reads potentiometers */
-            if(commStatus == 0) GPWM_GetSettings(&pwmData); // Local 
-            else GPWM_GetSettings(&pwmDataToSend); // Remote 
+            /* Reads potentiometers */ 
+            if(commStatus == ERROR_START || commStatus == ERROR_CRC)
+                GPWM_GetSettings(&pwmData); // Optain PWM data from the local ADC
+                                            // Else, the data are from the remote board
             
             /* Print on the LCD */
             GPWM_DispSettings(&pwmData, commStatus);
             
-            /* Executes PMM and motor management */
+            /* Executes PWM and motor management */
             GPWM_ExecPWM(&pwmData);
             
-            /* Sends data */
-            if(commStatus == 1) SendMessage(&pwmData); // Local 
-            else SendMessage(&pwmDataToSend); // Remote 
+            /* Sends data through USART */
+            if(commStatus == SUCCESS) SendMessage(&pwmData); // Local
+            else SendMessage(&pwmDataToSend); 
             
+            /* State machine update */
             appData.state = APP_STATE_WAIT;
+            BSP_LEDStateSet(BSP_LED_1, 1);
             break;
         }
 

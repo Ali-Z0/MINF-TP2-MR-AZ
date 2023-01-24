@@ -107,12 +107,7 @@ void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void) // Interru
     // Entré lorsque 3s on passer après l'initialisation
     if (i >= 151) 
     {
-        BSP_LEDStateSet(BSP_LED_1, 0);
         APP_UpdateState(APP_STATE_SERVICE_TASKS); 
-        //GPWM_GetSettings(&PwmData);
-        //GPWM_DispSettings(&PwmData);
-        //GPWM_ExecPWM(&PwmData);
-        BSP_LEDStateSet(BSP_LED_1, 1);
     }
     else
     {

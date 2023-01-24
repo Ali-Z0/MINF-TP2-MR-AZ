@@ -105,7 +105,7 @@ int GetMessage(S_pwmSettings *pData)
     /* Si il y a au minimum le contenu de 1 message à lire */
     /* Et que le premier caracter est celui de start */
     if((GetReadSize(&descrFifoRX) >= (MESS_SIZE))&&
-        (GetCharFromFifo(&descrFifoRX, &readChar)))
+        (GetCharFromFifo(&descrFifoRX, &readChar) == 0xAA))
     {
         /* Calcul initial du CRC */
         ValCrc16 = updateCRC16(0xFFFF, 0xAA);
@@ -189,7 +189,7 @@ void SendMessage(S_pwmSettings *pData)
     if ((RS232_CTS == 0) && (freeSize > 0))
     {
         // Autorise int émission    
-        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);                
+        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);             
     }
 }
 
@@ -200,9 +200,13 @@ void SendMessage(S_pwmSettings *pData)
 // !!!!!!!!
  void __ISR(_UART_1_VECTOR, ipl5AUTO) _IntHandlerDrvUsartInstance0(void)
 {
+    uint8_t freeSize, TXsize;
+    int8_t chr;
+    int8_t i_cts = 0;
+    BOOL  TxBuffFull;
     USART_ERROR UsartStatus;    
 
-
+    
     // Marque début interruption avec Led3
     LED3_W = 1;
     
@@ -214,7 +218,7 @@ void SendMessage(S_pwmSettings *pData)
         // Traitement de l'erreur à la réception.
     }
    
-
+    
     // Is this an RX interrupt ?
     if ( PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE) &&
                  PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_USART_1_RECEIVE) ) {
@@ -258,18 +262,29 @@ void SendMessage(S_pwmSettings *pData)
 
         // Traitement TX à faire ICI
         
-        // Envoi des caractères depuis le fifo SW -> buffer HW
-            
-        // Avant d'émettre, on vérifie 3 conditions :
-        //  Si CTS = 0 autorisation d'émettre (entrée RS232_CTS)
+        TXsize = GetReadSize (&descrFifoTX);
+       // i_cts = input(RS232_CTS);
+       // On vérifie 3 conditions :
+       // Si CTS = 0 (autorisation d'émettre)
+       // Si il y a un caractèreà émettre
+       // Si le txreg est bien disponible
         
-        //  S'il y a un caratères à émettre dans le fifo
-        //  S'il y a de la place dans le buffer d'émission (PLIB_USART_TransmitterBufferIsFull)
-        //   (envoi avec PLIB_USART_TransmitterByteSend())
+       // Il est possible de déposer un caractère
+       // tant que le tampon n'est pas plein
+       TxBuffFull = PLIB_USART_TransmitterBufferIsFull(USART_ID_1);
        
-        // ...
-        PLIB_USART_TransmitterByteSend(USART_ID_1, 5);
-	   
+        if ( (i_cts == 0) && ( TXsize > 0 ) && (TxBuffFull == false)){
+            do {
+                GetCharFromFifo(&descrFifoTX, &chr);
+                PLIB_USART_TransmitterByteSend(USART_ID_1, chr);
+                i_cts = RS232_CTS;
+                TXsize = GetReadSize (&descrFifoTX);
+                TxBuffFull =PLIB_USART_TransmitterBufferIsFull(USART_ID_1);
+            } while ( (i_cts == 0) && ( TXsize > 0 ) &&TxBuffFull==false );
+        }
+        
+       
+       
         LED5_W = !LED5_R; // Toggle Led5
 		
         // disable TX interrupt (pour éviter une interrupt. inutile si plus rien à transmettre)
@@ -280,6 +295,8 @@ void SendMessage(S_pwmSettings *pData)
     }
     // Marque fin interruption avec Led3
     LED3_W = 0;
+    
+    
  }
 
 

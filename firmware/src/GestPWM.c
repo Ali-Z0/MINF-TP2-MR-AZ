@@ -44,7 +44,6 @@ void GPWM_Initialize(S_pwmSettings *pData)
     DRV_OC0_Start();
     //init OC1 
     DRV_OC1_Start(); 
-    
 }
 
 // Obtention vitesse et angle (mise a jour des 4 champs de la structure)

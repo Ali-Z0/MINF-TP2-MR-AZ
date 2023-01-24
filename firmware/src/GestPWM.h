@@ -30,7 +30,6 @@
 #define SERVO_MIN 0.0006                        // Temps min du servo [s]
 
 
-
 typedef struct {
     
     /* Variables consignes */
@@ -43,7 +42,7 @@ typedef struct {
     S_ADCResults AdcResBuff[FILTER_SIZE]; // Données ADC
     float adcResFilt_Can0;
     float adcResFilt_Can1;
-    uint8_t cntAdc;  
+    uint8_t cntAdc; 
     
 } S_pwmSettings;
 
