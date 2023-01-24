@@ -192,16 +192,18 @@ void SendMessage(S_pwmSettings *pData)
                  PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT) ) {
 
         // Traitement TX à faire ICI
+        
         // Envoi des caractères depuis le fifo SW -> buffer HW
             
         // Avant d'émettre, on vérifie 3 conditions :
         //  Si CTS = 0 autorisation d'émettre (entrée RS232_CTS)
+        
         //  S'il y a un caratères à émettre dans le fifo
         //  S'il y a de la place dans le buffer d'émission (PLIB_USART_TransmitterBufferIsFull)
         //   (envoi avec PLIB_USART_TransmitterByteSend())
        
         // ...
-       
+        PLIB_USART_TransmitterByteSend(USART_ID_1, 5);
 	   
         LED5_W = !LED5_R; // Toggle Led5
 		

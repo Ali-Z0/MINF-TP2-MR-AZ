@@ -71,6 +71,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
+
+// Deleted ISR because of the Mc32gest_RS232.c file with the interrupt routine
+
 //void __ISR(_UART_1_VECTOR, ipl5AUTO) _IntHandlerDrvUsartInstance0(void)
 //{
 //    DRV_USART_TasksTransmit(sysObj.drvUsart0);
@@ -78,14 +81,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 //    DRV_USART_TasksReceive(sysObj.drvUsart0);
 //}
 
-void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void)
+void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void) // Interrupt all 20ms
 {
     //3 seconde initialisation
     static uint32_t i = 0;
     
     /* Mesure durée interrupt */
     BSP_LEDOn(BSP_LED_0);
-        
+    
     //paramètrage du timer
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
     
@@ -101,13 +104,15 @@ void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void)
         /* Incrémente pour executer directement la suite */
         i++;
     }
-    //Entré lorsque 3s on passer après l'initialisation
-    if (i >= 151)
+    // Entré lorsque 3s on passer après l'initialisation
+    if (i >= 151) 
     {
+        BSP_LEDStateSet(BSP_LED_1, 0);
         APP_UpdateState(APP_STATE_SERVICE_TASKS); 
         //GPWM_GetSettings(&PwmData);
         //GPWM_DispSettings(&PwmData);
         //GPWM_ExecPWM(&PwmData);
+        BSP_LEDStateSet(BSP_LED_1, 1);
     }
     else
     {
