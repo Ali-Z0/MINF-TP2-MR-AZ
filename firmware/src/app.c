@@ -163,6 +163,8 @@ void APP_Tasks ( void )
             
             /* Peripherals initalisations */
             GPWM_Initialize(&pwmData);
+            GPWM_Initialize(&PwmData);
+            InitFifoComm();
             
             // Initialisation l'ADc
             BSP_InitADC10();

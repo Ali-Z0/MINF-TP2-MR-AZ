@@ -66,6 +66,8 @@ void InitFifoComm(void)
     // Initialisation du fifo d'émission
     InitFifo ( &descrFifoTX, FIFO_TX_SIZE, fifoTX, 0 );
     
+
+    
     // Init RTS 
     RS232_RTS = 1;   // interdit émission par l'autre
    
