@@ -30,4 +30,9 @@ void SendMessage(S_pwmSettings *pData);
 extern S_fifo descrFifoRX;
 extern S_fifo descrFifoTX;
 
+// Type : retour des transmission
+typedef enum{
+    ERROR_START = 0, ERROR_CRC = 1, SUCCESS = 2
+}commStat;
+
 #endif

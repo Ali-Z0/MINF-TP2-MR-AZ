@@ -26,6 +26,14 @@ typedef union {
 
 // Definition pour les messages
 #define MESS_SIZE  5
+// Nombre de donnée concrètes dans le message
+#define MESS_BODY_SIZE 2
+
+// Emplacement du data SPEED dans le body du message
+#define SPEED_LOCATION 0
+// Emplacement du data ANGLE dans le body du message
+#define ANGLE_LOCATION 1
+
 // avec int8_t besoin -86 au lieu de 0xAA
 #define STX_code  (-86)
 
@@ -78,11 +86,68 @@ void InitFifoComm(void)
 // Valeur de retour 1  = message reçu donc en remote (data mis à jour)
 int GetMessage(S_pwmSettings *pData)
 {
-    int commStatus = 0;
+    /* Utiles - Temporaires */
+    commStat commStatus = ERROR_START;
+    uint16_t i = 0;
+    uint16_t ValCrc16 = 0;
+    
+    /* Reception */
+    char readChar = 0;
+    char rxMess[MESS_BODY_SIZE];
+    int8_t rxMsbCrc = 0;
+    int8_t rxLsbCrc = 0;
+    uint16_t rxValCrc16 = 0;
+    
     
     // Traitement de réception à introduire ICI
     // Lecture et décodage fifo réception
-    // ...
+    
+    /* Si il y a au minimum le contenu de 1 message à lire */
+    /* Et que le premier caracter est celui de start */
+    if((GetReadSize(&descrFifoRX) >= (MESS_SIZE))&&
+        (GetCharFromFifo(&descrFifoRX, &readChar)))
+    {
+        /* Calcul initial du CRC */
+        ValCrc16 = updateCRC16(0xFFFF, 0xAA);
+        
+        /* Tant que toutes les données CONCRETES du message ne sont pas lues */
+        for(i=0; i<(MESS_BODY_SIZE-1); i++)
+        {
+            /* Lire les données du message et mettre à jour le CRC */
+            GetCharFromFifo(&descrFifoRX, &rxMess[i]);
+            ValCrc16 = updateCRC16(ValCrc16, rxMess[i]);
+        }
+        
+        /* Lis le CRC MSB transmis */
+        GetCharFromFifo(&descrFifoRX, &rxMsbCrc);
+      
+        /* Lis le CRC LSB transmis */
+        GetCharFromFifo(&descrFifoRX, &rxLsbCrc);
+        
+        /* "fusionne" les CRC lus pour en faire un de 16bits */
+        rxValCrc16 = (uint16_t)((rxMsbCrc << 8) | (rxLsbCrc & 0x00FF));
+        
+        /* Si le CRC correspond */
+        if(rxValCrc16 == ValCrc16)
+        {
+            /* Met à jour les variables, vérifiées */
+            pData->SpeedSetting = rxMess[SPEED_LOCATION];
+            pData->AngleSetting = rxMess[ANGLE_LOCATION];
+            
+            /* Indique que la transmission s'est bien passée */
+            commStatus = SUCCESS;
+        }
+        else
+        {
+            /* Indique que le CRC est faux */
+            commStatus = ERROR_CRC;
+        }
+    }
+    else
+    {
+        /* Indique que byte debut de message faux */
+        commStatus = ERROR_START;
+    }
     
     
     // Gestion controle de flux de la réception
