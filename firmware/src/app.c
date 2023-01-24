@@ -57,6 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "GestPWM.h"
 #include "Mc32DriverLcd.h"
 #include "Mc32Delays.h"
+#include "Mc32gest_RS232.h"
 
 
 // *****************************************************************************
@@ -160,6 +161,7 @@ void APP_Tasks ( void )
             
             /* Peripherals initalisations */
             GPWM_Initialize(&PwmData);
+            InitFifoComm();
             
             //Initialisation l'ADc
             BSP_InitADC10();
