@@ -93,9 +93,9 @@ int GetMessage(S_pwmSettings *pData)
     
     /* Reception */
     char readChar = 0;
-    char rxMess[MESS_BODY_SIZE] = 0;
-    uint16_t rxMsbCrc = 0;
-    uint16_t rxLsbCrc = 0;
+    char rxMess[MESS_BODY_SIZE];
+    int8_t rxMsbCrc = 0;
+    int8_t rxLsbCrc = 0;
     uint16_t rxValCrc16 = 0;
     
     
@@ -115,7 +115,7 @@ int GetMessage(S_pwmSettings *pData)
         {
             /* Lire les données du message et mettre à jour le CRC */
             GetCharFromFifo(&descrFifoRX, &rxMess[i]);
-            ValCrc16 = updateCRC16(ValCrc16, &rxMess[i]);
+            ValCrc16 = updateCRC16(ValCrc16, rxMess[i]);
         }
         
         /* Lis le CRC MSB transmis */
@@ -125,7 +125,7 @@ int GetMessage(S_pwmSettings *pData)
         GetCharFromFifo(&descrFifoRX, &rxLsbCrc);
         
         /* "fusionne" les CRC lus pour en faire un de 16bits */
-        rxValCrc16 = (rxMsbCrc << 8) | (rxLsbCrc & 0x00FF);
+        rxValCrc16 = (uint16_t)((rxMsbCrc << 8) | (rxLsbCrc & 0x00FF));
         
         /* Si le CRC correspond */
         if(rxValCrc16 == ValCrc16)
