@@ -25,13 +25,14 @@
 
 #include <stdint.h>
 
+#define START_MESS 0xAA
 
 // structure décrivant un FIFO
 typedef struct fifo {
    int32_t fifoSize;   // taille du fifo
    int8_t *pDebFifo;   // pointeur sur début du fifo
    int8_t *pFinFifo;   // pointeur sur fin du fifo
-   int8_t *pWrite;      // pointeur d'écriture
+   int8_t *pWrite;     // pointeur d'écriture
    int8_t *pRead;      // pointeur de lecture
 } S_fifo;
 

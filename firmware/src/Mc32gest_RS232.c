@@ -101,7 +101,21 @@ void SendMessage(S_pwmSettings *pData)
     
     // Traitement émission à introduire ICI
     // Formatage message et remplissage fifo émission
-    // ...
+    TxMess.Angle = pData->AngleSetting;
+    TxMess.Speed = pData->SpeedSetting;
+    TxMess.Start = START_MESS;
+    
+    
+    // Tests if there are enough space in the FIFO
+    freeSize = GetReadSize(&descrFifoTX);
+    if(freeSize >= MESS_SIZE){
+        
+        PutCharInFifo(&descrFifoTX, TxMess.Start);
+        PutCharInFifo(&descrFifoTX, TxMess.Speed);
+        PutCharInFifo(&descrFifoTX, TxMess.Angle);
+        PutCharInFifo(&descrFifoTX, TxMess.MsbCrc);
+        PutCharInFifo(&descrFifoTX, TxMess.LsbCrc);
+    }
     
     
     // Gestion du controle de flux
