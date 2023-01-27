@@ -98,15 +98,17 @@ int GetMessage(S_pwmSettings *pData)
     int8_t rxMsbCrc = 0;
     int8_t rxLsbCrc = 0;
     uint16_t rxValCrc16 = 0;
-    
+    uint16_t readSize = 0;
     
     // Traitement de réception à introduire ICI
     // Lecture et décodage fifo réception
     
+    /* Obtention du caractère de start et de la taille du fifo */
+    GetCharFromFifo(&descrFifoRX, &readChar);
+    readSize = GetReadSize(&descrFifoRX);
     /* Si il y a au minimum le contenu de 1 message à lire */
     /* Et que le premier caracter est celui de start */
-    if((GetReadSize(&descrFifoRX) >= (MESS_SIZE))&&
-        (GetCharFromFifo(&descrFifoRX, &readChar) == 0xAA))
+    if((readSize >= (MESS_SIZE))&&(readChar == START_BYTE))
     {
         /* Calcul initial du CRC */
         ValCrc16 = updateCRC16(0xFFFF, START_BYTE);
