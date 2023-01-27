@@ -172,7 +172,7 @@ void SendMessage(S_pwmSettings *pData)
     
     
     // Tests if there are enough space in the FIFO
-    freeSize = GetReadSize(&descrFifoTX);
+    freeSize = GetWriteSpace(&descrFifoTX);
     if(freeSize >= MESS_SIZE){
         
         PutCharInFifo(&descrFifoTX, TxMess.Start);
@@ -233,7 +233,18 @@ void SendMessage(S_pwmSettings *pData)
             // Lecture des caractères depuis le buffer HW -> fifo SW
 			//  (pour savoir s'il y a une data dans le buffer HW RX : PLIB_USART_ReceiverDataIsAvailable())
 			//  (Lecture via fonction PLIB_USART_ReceiverByteReceive())
-            // ...
+
+            // Transfert dans le FIFO de tous les chars reçus
+            // 1 Si ONE_CHAR, 4 si HALF_FULL et 6 3B4FULL
+            while (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
+            {
+                chr = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+                PutCharInFifo ( &descrFifoRX, chr);
+                BSP_LEDToggle(BSP_LED_5); // pour comptage
+            }
+            // buffer is empty, clear interrupt flag
+            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_RECEIVE);
+
             
                          
             LED4_W = !LED4_R; // Toggle Led4

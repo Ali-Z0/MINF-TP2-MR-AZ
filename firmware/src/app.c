@@ -201,6 +201,8 @@ void APP_Tasks ( void )
             /* Executes PWM and motor management */
             GPWM_ExecPWM(&pwmData);
             
+            pwmDataToSend.AngleSetting = 10;
+            pwmDataToSend.SpeedSetting = 90;
             /* Sends data through USART */
             if(commStatus == SUCCESS) SendMessage(&pwmData); // Local
             else SendMessage(&pwmDataToSend); 
