@@ -26,6 +26,7 @@ typedef union {
 
 // Definition pour les messages
 #define MESS_SIZE  5
+#define START_BYTE  0xAA
 // Nombre de donnée concrètes dans le message
 #define MESS_BODY_SIZE 2
 
@@ -108,7 +109,7 @@ int GetMessage(S_pwmSettings *pData)
         (GetCharFromFifo(&descrFifoRX, &readChar) == 0xAA))
     {
         /* Calcul initial du CRC */
-        ValCrc16 = updateCRC16(0xFFFF, 0xAA);
+        ValCrc16 = updateCRC16(0xFFFF, START_BYTE);
         
         /* Tant que toutes les données CONCRETES du message ne sont pas lues */
         for(i=0; i<(MESS_BODY_SIZE-1); i++)
@@ -163,13 +164,25 @@ int GetMessage(S_pwmSettings *pData)
 void SendMessage(S_pwmSettings *pData)
 {
     int8_t freeSize;
+    uint16_t sendCrc = 0;
+    uint8_t sendMsbCrc = 0;
     
     // Traitement émission à introduire ICI
     // Formatage message et remplissage fifo émission
     TxMess.Angle = pData->AngleSetting;
     TxMess.Speed = pData->SpeedSetting;
     TxMess.Start = START_MESS;
+   
+    /* Calcul du CRC */
+    sendCrc =  updateCRC16(0xFFFF, TxMess.Start);
+    sendCrc =  updateCRC16(sendCrc, TxMess.Speed);
+    sendCrc =  updateCRC16(sendCrc, TxMess.Angle);
     
+    /* Entre le CRC */
+     TxMess.MsbCrc = (sendCrc&0xFF00) >> 8;
+     TxMess.LsbCrc = (sendCrc&0xFF);
+    
+    // TxMess.MsbCrc = updateCRC16
     
     // Tests if there are enough space in the FIFO
     freeSize = GetWriteSpace(&descrFifoTX);
