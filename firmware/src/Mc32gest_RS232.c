@@ -27,6 +27,7 @@ typedef union {
 // Definition pour les messages
 #define MESS_SIZE  5
 #define START_BYTE  0xAA
+#define CLE_CRC  0xFFFF
 // Nombre de donnée concrètes dans le message
 #define MESS_BODY_SIZE 2
 
@@ -93,8 +94,8 @@ int GetMessage(S_pwmSettings *pData)
     uint16_t ValCrc16 = 0;
     
     /* Reception */
-    char readChar = 0;
-    char rxMess[MESS_BODY_SIZE];
+    uint8_t readChar = 0;
+    uint8_t rxMess[MESS_BODY_SIZE];
     int8_t rxMsbCrc = 0;
     int8_t rxLsbCrc = 0;
     uint16_t rxValCrc16 = 0;
@@ -108,13 +109,13 @@ int GetMessage(S_pwmSettings *pData)
     readSize = GetReadSize(&descrFifoRX);
     /* Si il y a au minimum le contenu de 1 message à lire */
     /* Et que le premier caracter est celui de start */
-    if((readSize >= (MESS_SIZE))&&(readChar == START_BYTE))
+    if((readSize >= MESS_SIZE)&&(readChar == START_BYTE))
     {
         /* Calcul initial du CRC */
-        ValCrc16 = updateCRC16(0xFFFF, START_BYTE);
+        ValCrc16 = updateCRC16(CLE_CRC, START_BYTE);
         
         /* Tant que toutes les données CONCRETES du message ne sont pas lues */
-        for(i=0; i<(MESS_BODY_SIZE-1); i++)
+        for(i=0; i<(MESS_BODY_SIZE); i++)
         {
             /* Lire les données du message et mettre à jour le CRC */
             GetCharFromFifo(&descrFifoRX, &rxMess[i]);
@@ -176,7 +177,7 @@ void SendMessage(S_pwmSettings *pData)
     TxMess.Start = START_MESS;
    
     /* Calcul du CRC */
-    sendCrc =  updateCRC16(0xFFFF, TxMess.Start);
+    sendCrc =  updateCRC16(CLE_CRC, TxMess.Start);
     sendCrc =  updateCRC16(sendCrc, TxMess.Speed);
     sendCrc =  updateCRC16(sendCrc, TxMess.Angle);
     
