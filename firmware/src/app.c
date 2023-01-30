@@ -88,6 +88,8 @@ S_pwmSettings pwmData, pwmDataToSend;
 uint8_t LedOffFlag = 1;
 uint8_t chenillard = 0b00000001;
 
+commStat commStatus = 0;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Functions
@@ -144,7 +146,6 @@ void APP_Initialize ( void )
 
 void APP_Tasks ( void )
 {
-    commStat commStatus = 0;
 
     /* Check the application's current state. */
     switch ( appData.state )
@@ -188,12 +189,13 @@ void APP_Tasks ( void )
             BSP_LEDStateSet(BSP_LED_1, 0);
             
             /* Reception of parameters */ 
-            commStatus = GetMessage(&pwmData);
+            commStatus = GetMessage(&pwmData); 
             
             /* Reads potentiometers */ 
-            if(commStatus == ERROR_START || commStatus == ERROR_CRC)
+            if(commStatus == ERROR_START || commStatus == ERROR_CRC){
                 GPWM_GetSettings(&pwmData); // Optain PWM data from the local ADC
                                             // Else, the data are from the remote board
+            }
             else
                 GPWM_GetSettings(&pwmDataToSend);
                         

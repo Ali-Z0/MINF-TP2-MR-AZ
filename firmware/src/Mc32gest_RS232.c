@@ -154,6 +154,7 @@ int GetMessage(S_pwmSettings *pData)
         else
         {
             /* Indique que le CRC est faux */
+            BSP_LEDToggle(BSP_LED_6);
             commStatus = ERROR_CRC;
         }
     }
@@ -232,6 +233,7 @@ void SendMessage(S_pwmSettings *pData)
 // !!!!!!!!
  void __ISR(_UART_1_VECTOR, ipl5AUTO) _IntHandlerDrvUsartInstance0(void)
 {
+    BSP_LEDOn(BSP_LED_3);
     uint8_t freeSize, TXsize;
     int8_t chr;
     int8_t i_cts = 0;
@@ -254,7 +256,7 @@ void SendMessage(S_pwmSettings *pData)
     // Is this an RX interrupt ?
     if ( PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE) &&
                  PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_USART_1_RECEIVE) ) {
-
+                 BSP_LEDToggle(BSP_LED_4);
         // Oui Test si erreur parité ou overrun
         UsartStatus = PLIB_USART_ErrorsGet(USART_ID_1);
 
@@ -302,7 +304,7 @@ void SendMessage(S_pwmSettings *pData)
     // Is this an TX interrupt ?
     if ( PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT) &&
                  PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT) ) {
-
+        BSP_LEDToggle(BSP_LED_4);
         // Traitement TX à faire ICI
         
         TXsize = GetReadSize (&descrFifoTX);
@@ -339,7 +341,7 @@ void SendMessage(S_pwmSettings *pData)
     // Marque fin interruption avec Led3
     LED3_W = 0;
     
-    
+    BSP_LEDOff(BSP_LED_3);
  }
 
 
