@@ -144,7 +144,7 @@ void APP_Initialize ( void )
 
 void APP_Tasks ( void )
 {
-    static int commStatus = 0;
+    commStat commStatus = 0;
 
     /* Check the application's current state. */
     switch ( appData.state )
@@ -194,18 +194,20 @@ void APP_Tasks ( void )
             if(commStatus == ERROR_START || commStatus == ERROR_CRC)
                 GPWM_GetSettings(&pwmData); // Optain PWM data from the local ADC
                                             // Else, the data are from the remote board
-            
+            else
+                GPWM_GetSettings(&pwmDataToSend);
+                        
             /* Print on the LCD */
             GPWM_DispSettings(&pwmData, commStatus);
             
             /* Executes PWM and motor management */
             GPWM_ExecPWM(&pwmData);
             
-            pwmDataToSend.AngleSetting = 10;
-            pwmDataToSend.SpeedSetting = 90;
+            //pwmDataToSend.AngleSetting = pwmData.AngleSetting;
+            //pwmDataToSend.SpeedSetting = pwmData.SpeedSetting;
             /* Sends data through USART */
-            if(commStatus == SUCCESS) SendMessage(&pwmData); // Local
-            else SendMessage(&pwmDataToSend); 
+            if(commStatus == SUCCESS) SendMessage(&pwmDataToSend); // Local
+            else SendMessage(&pwmData); 
             
             /* State machine update */
             appData.state = APP_STATE_WAIT;

@@ -92,6 +92,7 @@ int GetMessage(S_pwmSettings *pData)
     commStat commStatus = ERROR_START;
     uint16_t i = 0;
     uint16_t ValCrc16 = 0;
+    static uint8_t noReception = 0;
     
     /* Reception */
     uint8_t readChar = 0;
@@ -109,8 +110,9 @@ int GetMessage(S_pwmSettings *pData)
     readSize = GetReadSize(&descrFifoRX);
     /* Si il y a au minimum le contenu de 1 message à lire */
     /* Et que le premier caracter est celui de start */
-    if((readSize >= MESS_SIZE)&&(readChar == START_BYTE))
+    if((readSize >= MESS_SIZE-1)&&(readChar == START_BYTE))
     {
+        noReception = 0;
         /* Calcul initial du CRC */
         ValCrc16 = updateCRC16(CLE_CRC, START_BYTE);
         
@@ -135,8 +137,16 @@ int GetMessage(S_pwmSettings *pData)
         if(rxValCrc16 == ValCrc16)
         {
             /* Met à jour les variables, vérifiées */
-            pData->SpeedSetting = rxMess[SPEED_LOCATION];
-            pData->AngleSetting = rxMess[ANGLE_LOCATION];
+            /* Avec controle des signes (conversion float) */
+            if(rxMess[SPEED_LOCATION] > 99)
+                pData->SpeedSetting = (float)rxMess[SPEED_LOCATION] - 256;
+            else
+                pData->SpeedSetting = (float)rxMess[SPEED_LOCATION];
+            
+            if(rxMess[ANGLE_LOCATION] > 90)
+                pData->AngleSetting = (float)rxMess[ANGLE_LOCATION] - 256;
+            else
+                pData->AngleSetting = (float)rxMess[ANGLE_LOCATION];
             
             /* Indique que la transmission s'est bien passée */
             commStatus = SUCCESS;
@@ -149,8 +159,14 @@ int GetMessage(S_pwmSettings *pData)
     }
     else
     {
-        /* Indique que byte debut de message faux */
-        commStatus = ERROR_START;
+        noReception++;
+        
+        if(noReception >= 10){
+            
+            noReception = 0;
+            /* Indique que byte debut de message faux */
+            commStatus = ERROR_START;
+        }
     }
     
     
